@@ -1,53 +1,69 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/dbConnect";
-import Testimonial from "@/models/Testimonial";
+import { NextRequest, NextResponse } from "next/server";
 
-// Get All Testimonials
-export async function GET() {
+// PUT মেথড (আপডেট করার জন্য)
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    await dbConnect();
-    const testimonials = await Testimonial.find({}).sort({ createdAt: -1 });
-    return NextResponse.json(
-      { success: true, data: testimonials },
-      { status: 200 },
-    );
+    const { id } = await params;
+    const body = await request.json();
+
+    // TODO: ডাটাবেজ আপডেট লজিক (আপনার আগের কোডের সাথে মিলিয়ে নিন)
+    // উদাহরণ: const updated = await updateTestimonial(id, body);
+
+    return NextResponse.json({
+      success: true,
+      data: { id, ...body },
+    });
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 },
+      { success: false, error: error.message || "Failed to update testimonial" },
+      { status: 500 }
     );
   }
 }
 
-// Create New Testimonial
-export async function POST(req: Request) {
+// DELETE মেথড (যদি এই ফাইলে থেকে থাকে)
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    await dbConnect();
-    const body = await req.json();
+    const { id } = await params;
 
-    console.log("--> Incoming Payload from Frontend:", body);
+    // TODO: ডাটাবেজ ডিলিট লজিক
+    // উদাহরণ: await deleteTestimonial(id);
 
-    // Schema validation অনুযায়ী exact mapping
-    const testimonialData = {
-      name: body.name,
-      role: body.role || "Client", // Required field fallback
-      content: body.comment || body.content || "No comment provided", // Required field mapping
-      avatarUrl: body.avatarUrl || "",
-      rating: Number(body.rating) || 5,
-    };
-
-    const newTestimonial = await Testimonial.create(testimonialData);
-    console.log("--> Successfully Saved to DB:", newTestimonial);
-
-    return NextResponse.json(
-      { success: true, data: newTestimonial },
-      { status: 201 },
-    );
+    return NextResponse.json({
+      success: true,
+      data: { id },
+    });
   } catch (error: any) {
-    console.error("--> Mongoose Save Error Details:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to save testimonial" },
-      { status: 400 },
+      { success: false, error: error.message || "Failed to delete testimonial" },
+      { status: 500 }
+    );
+  }
+}
+
+// GET মেথড (যদি স্পেসিফিক আইডি দিয়ে ফেচ করার লজিক থাকে)
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // TODO: ডাটাবেজ থেকে খোঁজার লজিক
+    return NextResponse.json({
+      success: true,
+      data: { id },
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message || "Testimonial not found" },
+      { status: 500 }
     );
   }
 }
