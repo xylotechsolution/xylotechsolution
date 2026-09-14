@@ -1,3 +1,4 @@
-if (!process.env.MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+// MongoDB কানেকশন বাইপাস করে ডামি অ্যাসিনক্রোনাস ফাংশন
+export default async function dbConnect() {
+  return Promise.resolve(null);
 }
