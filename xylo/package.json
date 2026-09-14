@@ -13,6 +13,7 @@
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
     "framer-motion": "^12.40.0",
+    "install": "^0.13.0",
     "lucide-react": "^1.21.0",
     "mongoose": "^9.9.1",
     "next": "16.2.9",

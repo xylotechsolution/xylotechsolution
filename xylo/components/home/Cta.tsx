@@ -81,7 +81,7 @@ export default function Cta() {
             {/* Header Tagline */}
             <div className="flex items-center space-x-4 text-xs font-bold uppercase tracking-[0.25em] text-[#E1B816] mb-8">
               <div className="w-12 h-[1px] bg-[#E1B816]" aria-hidden="true" />
-              <span>[07]</span>
+              <span>[08]</span>
               <span className="text-white/40">Contact</span>
             </div>
 
@@ -107,10 +107,10 @@ export default function Cta() {
                 Email
               </span>
               <a
-                href="mailto:info@xylo.agency"
+                href="mailto:xylotechsolution@gmail.com"
                 className="text-zinc-200 hover:text-[#E1B816] transition-colors font-medium"
               >
-                info@xylo.agency
+                xylotechsolution@gmail.com
               </a>
             </div>
             <div className="flex py-5 border-b border-white/10 items-center">
@@ -121,7 +121,7 @@ export default function Cta() {
                 href="tel:+4915754405511"
                 className="text-zinc-200 hover:text-[#E1B816] transition-colors font-medium"
               >
-                +49 1575 4405511
+                +8801632942393
               </a>
             </div>
 

@@ -54,7 +54,7 @@ export default function Faq() {
         {/* top subtitle */}
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-[1px] bg-[#E1B816]" />
-          <span className="text-[#E1B816]">[06]</span>
+          <span className="text-[#E1B816]">[07]</span>
           <span className="text-white/60 uppercase font-bold">
             Frequently Asked
           </span>
