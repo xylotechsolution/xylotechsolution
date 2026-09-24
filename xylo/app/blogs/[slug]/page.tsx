@@ -2,296 +2,303 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
-import { blogService } from "@/features/blogs/blogService";
-import { BlogPost } from "@/features/blogs/blog.types";
+import { blogsData } from "@/data/blogsData";
 
 export default function SingleBlogPage() {
   const params = useParams();
   const slug = params?.slug as string;
 
-  const [blog, setBlog] = useState<BlogPost | null>(null);
-  const [allBlogs, setAllBlogs] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!slug) return;
+    setIsMounted(true);
+  }, []);
 
-    const fetchData = async () => {
-      try {
-        const [singleData, listData] = await Promise.all([
-          blogService.getBlogBySlug(slug),
-          blogService.getAllBlogs(),
-        ]);
-        setBlog(singleData);
-        setAllBlogs(listData);
-      } catch (err) {
-        console.error("Failed to load article:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [slug]);
-
-  if (loading) {
+  if (!isMounted) {
     return (
-      <main className="min-h-screen bg-[#030303] text-white flex items-center justify-center text-sm text-zinc-500">
-        Loading article details...
+      <main className="min-h-screen bg-[#080808] text-white flex items-center justify-center">
+        <div className="flex items-center gap-3 text-xs font-mono text-zinc-500">
+          <div className="w-2 h-2 rounded-full bg-[#E1B816] animate-ping" />
+          Loading article...
+        </div>
       </main>
     );
   }
+
+  const blog = blogsData.find(
+    (b) => b.slug === slug || b.id.toString() === slug,
+  );
 
   if (!blog) {
     return (
-      <main className="min-h-screen bg-[#030303] text-white flex flex-col items-center justify-center gap-4">
-        <p className="text-zinc-400 text-sm">Article not found.</p>
+      <main className="min-h-screen bg-[#080808] text-white flex flex-col items-center justify-center gap-6 px-4">
+        <div className="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-2xl">
+          🔍
+        </div>
+        <div className="text-center">
+          <h2 className="text-xl font-bold mb-1">Article Not Found</h2>
+          <p className="text-zinc-500 text-xs max-w-xs">
+            The article you are looking for does not exist or has been moved.
+          </p>
+        </div>
         <Link
           href="/blogs"
-          className="text-xs font-bold text-[#E1B816] border border-[#E1B816]/30 px-4 py-2 rounded-lg hover:bg-[#E1B816]/10 transition"
+          className="text-xs font-semibold text-[#E1B816] bg-[#E1B816]/10 border border-[#E1B816]/20 px-5 py-2.5 rounded-full hover:bg-[#E1B816] hover:text-black transition-all duration-300"
         >
-          ← Back to Blogs
+          ← Back to Articles
         </Link>
       </main>
     );
   }
 
-  const imageUrl = blog.image
-    ? blog.image.startsWith("http")
-      ? blog.image
-      : `${process.env.NEXT_PUBLIC_API_URL || ""}${blog.image}`
-    : null;
+  const recentPosts = blogsData.filter((b) => b.id !== blog.id).slice(0, 4);
+  const relatedPosts = blogsData.filter((b) => b.id !== blog.id).slice(0, 3);
 
-  const recentPosts = allBlogs.filter((b) => b.id !== blog.id).slice(0, 4);
-  const relatedPosts = allBlogs.filter((b) => b.id !== blog.id).slice(0, 3);
   const tagsList = blog.tags
-    ? blog.tags.split(",")
+    ? typeof blog.tags === "string"
+      ? blog.tags.split(",")
+      : blog.tags
     : ["Tech", "Engineering", "Web"];
 
   return (
-    <main className="min-h-screen bg-[#030303] text-white py-40 px-6 md:px-16 font-sans">
-      <div className="max-w-7xl mx-auto">
-        {/* Back Button */}
-        <Link
-          href="/blogs"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-[#E1B816] mb-8 hover:underline"
-        >
-          ← Back to Blogs
-        </Link>
+    <main className="min-h-screen bg-[#080808] text-zinc-200 py-28 md:py-36 px-4 sm:px-8 md:px-16 font-sans relative overflow-hidden">
+      {/* Background Ambient Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-[#E1B816]/[0.03] blur-[140px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-amber-600/[0.02] blur-[120px] pointer-events-none rounded-full" />
 
-        {/* 2-Column Main Layout */}
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Navigation Breadcrumb */}
+        <div className="mb-10">
+          <Link
+            href="/blogs"
+            className="inline-flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-[#E1B816] transition-colors group"
+          >
+            <span className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-xs group-hover:border-[#E1B816]/50 transition-colors">
+              ←
+            </span>
+            Back to Articles
+          </Link>
+        </div>
+
+        {/* 2-Column Responsive Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* ================= LEFT MAIN CONTENT (8 Cols) ================= */}
+          {/* MAIN ARTICLE AREA (8 Cols) */}
           <article className="lg:col-span-8">
-            {/* Category & Date */}
-            <div className="flex items-center gap-3 text-xs text-zinc-500 mb-4">
+            {/* Meta Top Tagline */}
+            <div className="flex flex-wrap items-center gap-3 text-xs mb-6">
               {blog.category && (
-                <span className="text-[#E1B816] bg-[#E1B816]/10 px-3 py-1 rounded-full font-medium">
+                <span className="text-[#E1B816] bg-[#E1B816]/10 border border-[#E1B816]/20 px-3.5 py-1 rounded-full font-medium tracking-wide">
                   {blog.category}
                 </span>
               )}
-              <span>
-                {new Date(
-                  blog.published_date || blog.created_at,
-                ).toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </span>
+              {blog.readTime && (
+                <span className="text-zinc-500 font-mono flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                  {blog.readTime}
+                </span>
+              )}
+              {blog.date && (
+                <span className="text-zinc-500 font-mono flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                  {blog.date}
+                </span>
+              )}
             </div>
 
-            {/* Title */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-6">
+            {/* Article Headline */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-[1.15] mb-8">
               {blog.title}
             </h1>
 
-            {/* Excerpt / Lead Text */}
-            <p className="text-zinc-400 text-base md:text-lg leading-relaxed font-light mb-8">
-              {blog.description}
-            </p>
-
-            {/* Author Profile */}
-            <div className="flex items-center justify-between border-y border-white/[0.08] py-4 mb-8 text-xs text-zinc-400">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#E1B816]/20 border border-[#E1B816]/40 flex items-center justify-center font-bold text-[#E1B816]">
-                  {blog.author ? blog.author[0].toUpperCase() : "A"}
+            {/* Author Profile Ribbon */}
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-zinc-900/40 border border-white/[0.06] backdrop-blur-md mb-10">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#E1B816] to-amber-700 p-[1px]">
+                  <div className="w-full h-full bg-zinc-950 rounded-[11px] flex items-center justify-center font-bold text-[#E1B816]">
+                    {blog.author ? blog.author[0].toUpperCase() : "A"}
+                  </div>
                 </div>
                 <div>
-                  <p className="font-semibold text-white">
+                  <p className="text-sm font-semibold text-white">
                     {blog.author || "Admin"}
                   </p>
-                  <p className="text-[11px] text-zinc-500">
-                    Software Engineer & Author
+                  <p className="text-xs text-zinc-500">
+                    Software Engineer & Technical Writer
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-zinc-500">
-                <span>
-                  💬 {blog.comment_count || blog.comments?.length || 0} Comments
-                </span>
-                <span>
-                  ❤️ {blog.total_reactions || blog.reactions?.length || 0}{" "}
-                  Reactions
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="text-[11px] font-mono px-3 py-1 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-zinc-400">
+                  Verified Post
                 </span>
               </div>
             </div>
 
-            {/* Main Featured Image */}
-            {imageUrl && (
-              <div className="relative w-full h-[320px] md:h-[480px] rounded-2xl overflow-hidden mb-10 bg-zinc-900 border border-white/[0.08]">
-                <img
-                  src={imageUrl}
-                  alt={blog.title}
-                  className="w-full h-full object-cover"
+            {/* Featured Image */}
+            {blog.image && (
+              <div className="relative w-full h-[340px] sm:h-[420px] md:h-[480px] rounded-3xl overflow-hidden mb-12 border border-white/[0.08] shadow-2xl group">
+                <Image
+                  src={blog.image}
+                  alt={blog.title || "Blog Image"}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  priority
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent opacity-40" />
               </div>
             )}
 
-            {/* Content Body */}
-            <div className="text-zinc-300 text-base md:text-lg leading-relaxed space-y-6 font-light mb-12 whitespace-pre-line">
+            {/* Main Article Body */}
+            <div className="prose prose-invert max-w-none text-zinc-300 text-base md:text-lg leading-relaxed font-light space-y-6 mb-12 whitespace-pre-line">
               {blog.description}
             </div>
 
-            {/* Quote Block Highlight (Image Inspiration) */}
-            <div className="bg-white/[0.02] border-l-4 border-[#E1B816] p-6 rounded-r-xl mb-12">
-              <p className="text-sm md:text-base text-zinc-200 italic font-medium">
-                "Continuous learning and adapting modern frontend patterns are
-                key to building world-class web applications."
+            {/* Highlighted Callout Box */}
+            <div className="relative p-6 md:p-8 rounded-2xl bg-gradient-to-r from-[#E1B816]/[0.08] to-transparent border-l-4 border-[#E1B816] my-10 overflow-hidden">
+              <p className="text-base md:text-lg text-zinc-100 italic font-medium leading-relaxed relative z-10">
+                &quot;Continuous learning and adapting modern frontend patterns
+                are key to building world-class web applications.&quot;
               </p>
             </div>
 
-            {/* Tags Section */}
-            <div className="flex flex-wrap items-center gap-2 pt-6 border-t border-white/[0.08] mb-12">
-              <span className="text-xs text-zinc-500 mr-2">Tags:</span>
+            {/* Article Tags */}
+            <div className="pt-8 border-t border-white/[0.08] flex flex-wrap items-center gap-2 mb-12">
+              <span className="text-xs text-zinc-500 font-mono uppercase tracking-wider mr-2">
+                Topic Tags:
+              </span>
               {tagsList.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-xs bg-zinc-900 border border-white/10 text-zinc-300 px-3 py-1 rounded-md"
+                  className="text-xs font-mono bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1.5 rounded-lg hover:border-[#E1B816]/40 hover:text-white transition-colors cursor-default"
                 >
                   #{tag.trim()}
                 </span>
               ))}
             </div>
 
-            {/* Bottom Callout Card */}
-            <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-6 mb-16">
+            {/* Bottom Contact Callout */}
+            <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/[0.08] backdrop-blur-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
-                <h4 className="text-xl font-bold text-white mb-2">
-                  Have questions about this topic?
+                <h4 className="text-lg font-bold text-white mb-1">
+                  Have feedback or questions?
                 </h4>
-                <p className="text-zinc-400 text-xs font-light">
-                  Feel free to reach out or drop a message anytime.
+                <p className="text-xs text-zinc-400 max-w-md">
+                  Feel free to reach out if you want to discuss this project or
+                  collaborate.
                 </p>
               </div>
               <Link
                 href="/contact"
-                className="bg-[#E1B816] hover:bg-[#c9a312] text-black font-bold text-xs px-6 py-3 rounded-xl transition whitespace-nowrap"
+                className="bg-[#E1B816] hover:bg-amber-400 text-black font-semibold text-xs px-6 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-[#E1B816]/10 whitespace-nowrap"
               >
                 Get in Touch
               </Link>
             </div>
-
-            {/* Bottom Newsletter Banner */}
-            <div className="p-8 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/80 to-zinc-950 border border-white/[0.08] mb-16">
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Subscribe to Tech Insights
-              </h3>
-              <p className="text-zinc-400 text-xs font-light mb-6">
-                Get notified whenever I publish new tech blogs and breakdowns.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder="Enter your email address..."
-                  className="bg-black/50 border border-white/10 text-white text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-[#E1B816] w-full"
-                />
-                <button className="bg-[#E1B816] text-black font-bold text-xs px-6 py-3 rounded-xl hover:bg-[#c9a312] transition whitespace-nowrap">
-                  Subscribe
-                </button>
-              </div>
-            </div>
           </article>
 
-          {/* ================= RIGHT SIDEBAR (4 Cols) ================= */}
+          {/* SIDEBAR AREA (4 Cols) */}
           <aside className="lg:col-span-4 space-y-8">
-            {/* Widget 1: Quick Overview Card */}
-            <div className="bg-white/[0.02] border border-white/[0.08] p-6 rounded-2xl sticky top-8">
-              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-[#E1B816] mb-4">
-                Article Info
-              </h3>
-              <div className="space-y-3 text-xs border-t border-white/[0.05] pt-4 text-zinc-400">
-                <div className="flex justify-between">
-                  <span>Author:</span>
-                  <span className="text-white font-medium">
+            {/* Widget 1: Article Stats */}
+            <div className="p-6 rounded-3xl bg-zinc-900/30 border border-white/[0.08] backdrop-blur-xl sticky top-8">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-2 h-2 rounded-full bg-[#E1B816]" />
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">
+                  Article Overview
+                </h3>
+              </div>
+
+              <div className="space-y-3.5 text-xs border-t border-white/[0.06] pt-4 text-zinc-400 font-mono">
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-500">Author</span>
+                  <span className="text-zinc-200 font-sans font-medium">
                     {blog.author || "Admin"}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Category:</span>
-                  <span className="text-white font-medium">
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-500">Category</span>
+                  <span className="text-zinc-200 font-sans font-medium">
                     {blog.category || "General"}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Published:</span>
-                  <span className="text-white font-medium">
-                    {new Date(
-                      blog.published_date || blog.created_at,
-                    ).toLocaleDateString()}
-                  </span>
-                </div>
+                {blog.readTime && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-500">Estimated Read</span>
+                    <span className="text-zinc-200 font-sans font-medium">
+                      {blog.readTime}
+                    </span>
+                  </div>
+                )}
+                {blog.date && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-zinc-500">Published</span>
+                    <span className="text-zinc-200 font-sans font-medium">
+                      {blog.date}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Widget 2: Recent Articles List */}
-            <div className="bg-white/[0.02] border border-white/[0.08] p-6 rounded-2xl">
-              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-[#E1B816] mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#E1B816]"></span>{" "}
-                Recent Reads
-              </h3>
-              <div className="flex flex-col divide-y divide-white/[0.05]">
-                {recentPosts.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/blogs/${item.slug || item.id}`}
-                    className="py-4 first:pt-0 last:pb-0 group block"
-                  >
-                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">
-                      {item.category || "Article"}
-                    </span>
-                    <h4 className="text-xs font-semibold text-zinc-200 group-hover:text-[#E1B816] transition-colors line-clamp-2">
-                      {item.title}
-                    </h4>
-                  </Link>
-                ))}
+            {/* Widget 2: Recent Articles */}
+            {recentPosts.length > 0 && (
+              <div className="p-6 rounded-3xl bg-zinc-900/30 border border-white/[0.08] backdrop-blur-xl">
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E1B816]" />
+                  Recent Articles
+                </h3>
+
+                <div className="flex flex-col gap-4">
+                  {recentPosts.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/blogs/${item.slug || item.id}`}
+                      className="p-3.5 rounded-2xl bg-zinc-900/50 hover:bg-zinc-800/50 border border-white/[0.04] hover:border-white/10 transition-all duration-300 group block"
+                    >
+                      <span className="text-[10px] font-mono text-[#E1B816] uppercase tracking-wider block mb-1">
+                        {item.category || "Article"}
+                      </span>
+                      <h4 className="text-xs font-medium text-zinc-200 group-hover:text-white transition-colors line-clamp-2 leading-snug">
+                        {item.title}
+                      </h4>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </aside>
         </div>
 
-        {/* ================= BOTTOM RELATED ARTICLES SECTION ================= */}
+        {/* RELATED ARTICLES SECTION */}
         {relatedPosts.length > 0 && (
-          <div className="mt-20 pt-12 border-t border-white/[0.08]">
-            <h3 className="text-2xl font-bold text-white mb-8">
-              Related Articles
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="mt-24 pt-16 border-t border-white/[0.08]">
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-1">
+                  More Articles
+                </h3>
+                <p className="text-xs text-zinc-400">
+                  Explore other related posts and tutorials
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedPosts.map((item) => (
                 <Link
                   key={item.id}
                   href={`/blogs/${item.slug || item.id}`}
-                  className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 hover:border-white/[0.15] transition group block"
+                  className="p-6 rounded-3xl bg-zinc-900/30 border border-white/[0.06] hover:border-[#E1B816]/30 transition-all duration-300 group block hover:-translate-y-1"
                 >
-                  <span className="text-[10px] text-[#E1B816] font-bold uppercase tracking-wider block mb-2">
+                  <span className="text-[10px] font-mono text-[#E1B816] uppercase tracking-wider block mb-3">
                     {item.category || "Read Next"}
                   </span>
                   <h4 className="text-base font-bold text-white group-hover:text-[#E1B816] transition-colors mb-2 line-clamp-2">
                     {item.title}
                   </h4>
-                  <p className="text-zinc-400 text-xs line-clamp-2 font-light">
+                  <p className="text-zinc-400 text-xs line-clamp-2 font-light leading-relaxed">
                     {item.description}
                   </p>
                 </Link>

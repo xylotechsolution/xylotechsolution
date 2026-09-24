@@ -36,7 +36,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="relative w-full bg-[#030303] text-white pt-32 pb-12 overflow-hidden select-none">
+    <footer className="relative w-full bg-[#030303] text-white pt-12 pb-12 overflow-hidden select-none">
       {/* ১. ব্যাকগ্রাউন্ডের জায়ান্ট টেক্সট (XYLO) - পুরো বডি কাভার করার জন্য আপগ্রেড করা হয়েছে */}
       {/* <div className="absolute inset-x-0 top-6 md:top-0 w-full flex justify-center pointer-events-none z-0">
         <h1 className="text-[24vw] font-black tracking-tighter text-[#141414] opacity-80 uppercase select-none leading-none w-full text-center">
