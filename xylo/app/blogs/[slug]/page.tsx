@@ -6,6 +6,22 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { blogsData } from "@/data/blogsData";
 
+// Content Array Types
+type ContentItem =
+  | { type: "intro"; text: string }
+  | { type: "paragraph"; text: string }
+  | { type: "heading"; text: string }
+  | { type: "list"; items: string[] }
+  | { type: "table"; headers: string[]; rows: string[][] }
+  | {
+      type: "cta";
+      title: string;
+      text: string;
+      buttonText: string;
+      buttonLink: string;
+    }
+  | { type: "faq"; question: string; answer: string };
+
 export default function SingleBlogPage() {
   const params = useParams();
   const slug = params?.slug as string;
@@ -151,17 +167,143 @@ export default function SingleBlogPage() {
               </div>
             )}
 
-            {/* Main Article Body */}
-            <div className="prose prose-invert max-w-none text-zinc-300 text-base md:text-lg leading-relaxed font-light space-y-6 mb-12 whitespace-pre-line">
-              {blog.description}
-            </div>
+            {/* Main Article Description / Intro */}
+            {blog.description && (
+              <div className="text-zinc-300 text-base md:text-lg leading-relaxed font-light mb-8">
+                {blog.description}
+              </div>
+            )}
 
-            {/* Highlighted Callout Box */}
-            <div className="relative p-6 md:p-8 rounded-2xl bg-gradient-to-r from-[#E1B816]/[0.08] to-transparent border-l-4 border-[#E1B816] my-10 overflow-hidden">
-              <p className="text-base md:text-lg text-zinc-100 italic font-medium leading-relaxed relative z-10">
-                &quot;Continuous learning and adapting modern frontend patterns
-                are key to building world-class web applications.&quot;
-              </p>
+            {/* DYNAMIC CONTENT RENDERER */}
+            <div className="space-y-6 mb-12">
+              {blog.content?.map((item: ContentItem, idx: number) => {
+                switch (item.type) {
+                  case "intro":
+                    return (
+                      <div
+                        key={idx}
+                        className="relative p-6 md:p-8 rounded-2xl bg-gradient-to-r from-[#E1B816]/[0.08] to-transparent border-l-4 border-[#E1B816] my-6"
+                      >
+                        <p className="text-base md:text-lg text-zinc-100 italic font-medium leading-relaxed">
+                          &quot;{item.text}&quot;
+                        </p>
+                      </div>
+                    );
+
+                  case "paragraph":
+                    return (
+                      <p
+                        key={idx}
+                        className="text-zinc-300 text-base md:text-lg leading-relaxed font-light"
+                      >
+                        {item.text}
+                      </p>
+                    );
+
+                  case "heading":
+                    return (
+                      <h2
+                        key={idx}
+                        className="text-2xl sm:text-3xl font-bold text-white pt-6 pb-2"
+                      >
+                        {item.text}
+                      </h2>
+                    );
+
+                  case "list":
+                    return (
+                      <ul key={idx} className="space-y-3 my-4">
+                        {item.items.map((listItem, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 text-zinc-300 text-base md:text-lg"
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#E1B816] mt-2.5 flex-shrink-0" />
+                            <span>{listItem}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    );
+
+                  case "table":
+                    return (
+                      <div
+                        key={idx}
+                        className="my-8 overflow-x-auto rounded-2xl border border-white/[0.08] bg-zinc-900/30"
+                      >
+                        <table className="w-full text-left border-collapse min-w-[500px]">
+                          <thead>
+                            <tr className="border-b border-white/[0.08] bg-zinc-900/80 text-xs font-mono uppercase tracking-wider text-[#E1B816]">
+                              {item.headers.map((header, i) => (
+                                <th key={i} className="p-4">
+                                  {header}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/[0.05] text-sm text-zinc-300 font-light">
+                            {item.rows.map((row, rIdx) => (
+                              <tr
+                                key={rIdx}
+                                className="hover:bg-zinc-800/30 transition-colors"
+                              >
+                                {row.map((cell, cIdx) => (
+                                  <td key={cIdx} className="p-4">
+                                    {cell}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+
+                  case "cta":
+                    return (
+                      <div
+                        key={idx}
+                        className="my-10 p-8 rounded-3xl bg-gradient-to-r from-[#E1B816]/20 via-zinc-900 to-zinc-900 border border-[#E1B816]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+                      >
+                        <div>
+                          <h3 className="text-xl font-bold text-white mb-2">
+                            {item.title}
+                          </h3>
+                          <p className="text-xs text-zinc-400 max-w-md">
+                            {item.text}
+                          </p>
+                        </div>
+                        <Link
+                          href={item.buttonLink || "/contact"}
+                          className="bg-[#E1B816] hover:bg-amber-400 text-black font-semibold text-xs px-6 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-[#E1B816]/10 whitespace-nowrap"
+                        >
+                          {item.buttonText}
+                        </Link>
+                      </div>
+                    );
+
+                  case "faq":
+                    return (
+                      <div
+                        key={idx}
+                        className="my-4 p-5 rounded-2xl bg-zinc-900/40 border border-white/[0.06]"
+                      >
+                        <h4 className="font-semibold text-white text-base mb-2 flex items-center gap-2">
+                          <span className="text-[#E1B816] font-mono text-xs">
+                            Q.
+                          </span>{" "}
+                          {item.question}
+                        </h4>
+                        <p className="text-xs text-zinc-400 leading-relaxed pl-5">
+                          {item.answer}
+                        </p>
+                      </div>
+                    );
+
+                  default:
+                    return null;
+                }
+              })}
             </div>
 
             {/* Article Tags */}
