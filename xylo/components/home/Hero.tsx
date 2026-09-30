@@ -28,7 +28,7 @@ export default function Hero() {
             muted
             playsInline
             preload="metadata"
-            poster="/video-poster.jpg"
+            poster="/images/hero/video-poster.webp"
             className="w-full h-full object-cover opacity-25 scale-105"
           >
             <source src="/images/hero/bg-video.mp4" type="video/mp4" />
