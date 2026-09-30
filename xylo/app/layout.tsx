@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Black_Ops_One, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { Providers } from "@/components/providers/Providers";
 import ClientLayoutWrapper from "@/components/providers/ClientLayoutWrapper";
 
@@ -19,24 +17,32 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Xylo Tech Solutions | Xylo Tech",
-    template: "%s | Xylo Tech Solutions",
+    default: "XYLO Tech Solution",
+    template: "%s | XYLO Tech Solution",
   },
   description:
-    "Xylo Tech Solutions (Xylo Tech / Xylo) builds high-performance websites, premium software, and next-gen intelligent mobile ecosystems in Bangladesh and worldwide.",
+    "XYLO Tech Solution builds high-performance websites, premium software, and next-gen intelligent mobile ecosystems in Bangladesh and worldwide.",
+  icons: {
+    icon: [
+      {
+        url: "/xylo logo.svg",
+        type: "image/svg+xml",
+      },
+    ],
+  },
   keywords: [
-    "Xylo Tech Solutions",
-    "Xylo Tech",
-    "Xylo",
+    "XYLO Tech Solution",
+    "XYLO Tech",
+    "XYLO",
     "xylotechsolution",
     "xylo tech solution",
     "Software Company Dhaka",
     "Web Architecture",
     "Next.js Development",
   ],
-  authors: [{ name: "Xylo Tech Team" }],
-  creator: "Xylo Tech Solutions",
-  publisher: "Xylo Tech Solutions",
+  authors: [{ name: "XYLO Tech Team" }],
+  creator: "XYLO Tech Solution",
+  publisher: "XYLO Tech Solution",
   robots: {
     index: true,
     follow: true,
@@ -52,17 +58,19 @@ export const metadata: Metadata = {
     canonical: "https://xylotechsolution.com",
   },
   openGraph: {
-    title: "Xylo Tech Solutions",
-    description: "Next-Gen Software & Intelligent Web Architecture by Xylo Tech",
+    title: "XYLO Tech Solution",
+    description:
+      "Next-Gen Software & Intelligent Web Architecture by XYLO Tech Solution",
     url: "https://xylotechsolution.com",
-    siteName: "Xylo Tech Solutions",
+    siteName: "XYLO Tech Solution",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Xylo Tech Solutions",
-    description: "Next-Gen Software & Intelligent Web Architecture by Xylo Tech",
+    title: "XYLO Tech Solution",
+    description:
+      "Next-Gen Software & Intelligent Web Architecture by XYLO Tech Solution",
   },
 };
 
@@ -75,9 +83,7 @@ export default function RootLayout({
     <html lang="en" className={`${blackOpsOne.variable} ${inter.variable}`}>
       <body className="bg-black text-white antialiased">
         <Providers>
-          {/* <Navbar /> */}
           <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
-          {/* <Footer /> */}
         </Providers>
       </body>
     </html>
