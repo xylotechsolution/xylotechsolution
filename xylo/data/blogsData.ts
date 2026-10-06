@@ -1349,7 +1349,7 @@ export const blogsData = [
     badge: "TECH GUIDE",
     description:
       "Understand the key differences between websites and web applications, how they work, and which solution is right for your business.",
-    image: "/blogs/blog-11.png",
+    image: "/images/blogs/4.png",
     slug: "website-vs-web-application",
 
     content: [
